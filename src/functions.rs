@@ -89,32 +89,6 @@ pub fn fluosub_cake(cake:Cake, pfactor:f64, fluo_k: f64)->Cake{
     newcake
 }
 
-fn fluosub_lsquare(fluo_k: f64, cake:Cake, pfactor:f64)->f64{
-    let newcake = fluosub_cake(cake, pfactor, fluo_k);
-    let chilen = newcake.cake.dim1();
-    let tthlen = newcake.cake.dim2();
-    let index = tthlen*96/100;
-    let mut slice : Vec<f64> = Vec::new();
-    let mut mean: f64 = 0.;
-    let mut div = 0.;
-    let a = newcake.cake.data();
-    for chii in 0..chilen{
-        let i = chii*tthlen + index;
-        let intensity = a[i];
-        if intensity > 0.{
-            slice.push(intensity);
-            mean += intensity;
-            div += 1.;
-        }
-    }
-    mean = mean/div;
-
-    let mut sum = 0.;
-    for item in slice{
-        sum += f64::powi(item-mean,2);
-    }
-    sum
-}  
 
 pub fn fluosub_curvefit(fluo_k:f64, cake:Cake, pfactor:f64, tthindex:usize)->Cake{
     let tthrange = cake.radial_positions;
@@ -175,3 +149,42 @@ impl MPFitter for Linear{
         self.x.len()
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+/*
+/// possible alternative minimisation
+fn fluosub_lsquare(fluo_k: f64, cake:Cake, pfactor:f64)->f64{
+    let newcake = fluosub_cake(cake, pfactor, fluo_k);
+    let chilen = newcake.cake.dim1();
+    let tthlen = newcake.cake.dim2();
+    let index = tthlen*96/100;
+    let mut slice : Vec<f64> = Vec::new();
+    let mut mean: f64 = 0.;
+    let mut div = 0.;
+    let a = newcake.cake.data();
+    for chii in 0..chilen{
+        let i = chii*tthlen + index;
+        let intensity = a[i];
+        if intensity > 0.{
+            slice.push(intensity);
+            mean += intensity;
+            div += 1.;
+        }
+    }
+    mean = mean/div;
+
+    let mut sum = 0.;
+    for item in slice{
+        sum += f64::powi(item-mean,2);
+    }
+    sum
+}  */ 
