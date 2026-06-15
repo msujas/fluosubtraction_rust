@@ -1,0 +1,9 @@
+[package]
+name = "fluosubtraction_rust"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+cryiorust = {git = "https://git.3lp.cx/dyadkin/cryiorust"}
+integrustio = {git = "https://git.3lp.cx/dyadkin/integrustio"}
+rmpfit = "1.0.1"
