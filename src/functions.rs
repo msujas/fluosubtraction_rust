@@ -90,7 +90,7 @@ pub fn fluosub_cake(cake:Cake, pfactor:f64, fluo_k: f64)->Cake{
 }
 
 
-pub fn fluosub_curvefit(fluo_k:f64, cake:Cake, pfactor:f64, tthindex:usize)->Cake{
+pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Cake{
     let tthrange = cake.radial_positions;
     let chirange = cake.azimuthal_positions;
     let chilen = cake.cake.dim1();
@@ -109,7 +109,7 @@ pub fn fluosub_curvefit(fluo_k:f64, cake:Cake, pfactor:f64, tthindex:usize)->Cak
         }
     }
     let mut l = Linear{x:pslicecut,y: cakeslicecut};
-    let mut init = [0., fluo_k];
+    let mut init = [0., fluo_k0];
     let _res = l.mpfit(&mut init).unwrap();
     let newfluok = init[1];
     let mut newcakevec = cake.cake.data().clone();
