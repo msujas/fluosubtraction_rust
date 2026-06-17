@@ -19,9 +19,7 @@ fn array_get_tthslice(a:&Array, tthindex:usize)-> Vec<f64>{
     for chii in 0..chilen{
         let i = chii*tthlen + tthindex;
         let intensity = a[i];
-        if intensity > 0.{
-            slice.push(intensity);
-        }
+        slice.push(intensity);
     }
     slice
 }
