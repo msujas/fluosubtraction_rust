@@ -9,7 +9,7 @@ fn polarization(tth:f64, chi:f64, pfactor:f64)->f64{
     //0.5*(1.0 + np.cos(tthr)**2 - pfactor * np.cos(2.0 *chir) * (1.0 - np.cos(tthr)**2))
     let tthr = tth*PI/180.;
     let chir = chi*PI/180.;
-    0.5*(1.+tthr.cos() - pfactor * (2.*chir).cos()*(1.- tthr.cos().powi(2)))
+    0.5*(1.+tthr.cos().powi(2) - pfactor * (2.*chir).cos()*(1.- tthr.cos().powi(2)))
 }
 
 fn array_get_tthslice(a:&Array, tthindex:usize)-> Vec<f64>{
@@ -110,6 +110,7 @@ pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Ca
     let mut init = [0., fluo_k0];
     let _res = l.mpfit(&mut init).unwrap();
     let newfluok = init[1];
+    println!("new fluok: {newfluok}");
     let mut newcakevec = cake.cake.data().clone();
     for (c,p) in newcakevec.iter_mut().zip(polcakearray.data().iter()){
         *c = *c - *p * newfluok;
