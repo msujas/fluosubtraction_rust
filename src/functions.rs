@@ -1,4 +1,4 @@
-use std::{ f64::consts::PI };
+use std::{ f64::consts::PI, sync::Arc };
 
 use cryiorust::frame::Array;
 use integrustio::integrator::Cake;
@@ -25,15 +25,28 @@ fn array_get_tthslice(a:&Array, tthindex:usize)-> Vec<f64>{
 }
 
 
-fn getpolcake(tthrange:Vec<f64>, chirange:Vec<f64>, pfactor:f64)->Vec<f64>{
+pub fn getpolcake(tthrange:Vec<f64>, chirange:Vec<f64>, pfactor:f64, fname:Option<String>)->Vec<f64>{
     let mut pvec: Vec<f64> = Vec::new();
     for chi in chirange.iter(){
         for tth in tthrange.iter(){
             pvec.push(polarization(*tth, *chi, pfactor));
         }
     }
+    if let Some(fname) = fname{
+        let a = Array::with_data(chirange.len(),tthrange.len(), pvec.clone());
+        let mut cake:Cake = Default::default();
+        let (intensity, sigma) = intensity_from_array(&a);
+        cake.cake = a;
+        cake.azimuthal_positions = Arc::new(chirange);
+        cake.radial_positions = Arc::new(tthrange.clone());
+        cake.radial.intensity = intensity;
+        cake.radial.sigma = sigma;
+        cake.radial.positions = Arc::new(tthrange.clone());
+        cake.store(fname,None).unwrap();
+    }
     pvec
 }
+
 
 fn intensity_from_array(array:&Array)-> (Vec<f64>, Vec<f64>){
     let a = array.data();
@@ -69,11 +82,11 @@ pub fn fluosub_cake(cake:Cake, pfactor:f64, fluo_k: f64)->Cake{
     let chirange = chirangea.to_vec();
     let chisize = cake.cake.dim1();
     let tthsize = cake.cake.dim2();
-    let pmap = getpolcake(tthrange, chirange, pfactor);
+    let pmap = getpolcake(tthrange, chirange, pfactor,None);
     let cake = cake.cake.data();
     let mut fluosubcake: Vec<f64> = Vec::new();
     for (i, p) in cake.iter().zip(pmap.iter()){
-        fluosubcake.push(i - fluo_k*p);
+        fluosubcake.push(i - fluo_k/p);
     }
     let a = Array::with_data(chisize, tthsize, fluosubcake);
     let (intensity, sigma) = intensity_from_array(&a);
@@ -93,7 +106,7 @@ pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Ca
     let chirange = cake.azimuthal_positions;
     let chilen = cake.cake.dim1();
     let tthlen=  cake.cake.dim2();
-    let polcake = getpolcake(tthrange.to_vec(), chirange.to_vec(), pfactor);
+    let polcake = getpolcake(tthrange.to_vec(), chirange.to_vec(), pfactor,None);
     let polcakearray = Array::with_data( chilen, tthlen, polcake);
     let pslice = array_get_tthslice(&polcakearray, tthindex);
     let cakeslice = array_get_tthslice(&cake.cake, tthindex);
@@ -113,7 +126,7 @@ pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Ca
     println!("new fluok: {newfluok}");
     let mut newcakevec = cake.cake.data().clone();
     for (c,p) in newcakevec.iter_mut().zip(polcakearray.data().iter()){
-        *c = *c - *p * newfluok;
+        *c = *c -  newfluok/ *p;
     }
     let mut newcake : Cake = Default::default();
     let newarray = Array::with_data(chilen, tthlen, newcakevec);
@@ -139,7 +152,7 @@ impl MPFitter for Linear{
             .zip(self.x.iter())
             .zip(self.y.iter())
         {
-            let f = params[0] + params[1] * *x; 
+            let f = params[0] + params[1] / *x; 
             *d = *y - f;
         }
         Ok(())
@@ -187,3 +200,15 @@ fn fluosub_lsquare(fluo_k: f64, cake:Cake, pfactor:f64)->f64{
     }
     sum
 }  */ 
+
+
+#[cfg(test)]
+mod tests{
+    use super::*;
+    #[test]
+    fn polcaketest(){
+        let tthrange:Vec<f64> = (1..60).map(f64::from).collect();
+        let chirange:Vec<f64> = (0..359).map(f64::from).collect();
+        getpolcake(tthrange, chirange, 0.85, Some(String::from("./polcake.edf")));
+    }
+}
