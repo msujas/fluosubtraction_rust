@@ -126,7 +126,9 @@ pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Ca
     println!("new fluok: {newfluok}");
     let mut newcakevec = cake.cake.data().clone();
     for (c,p) in newcakevec.iter_mut().zip(polcakearray.data().iter()){
-        *c = *c -  newfluok/ *p;
+        if *c > 0.{
+            *c = *c -  newfluok/ *p;
+        }
     }
     let mut newcake : Cake = Default::default();
     let newarray = Array::with_data(chilen, tthlen, newcakevec);
