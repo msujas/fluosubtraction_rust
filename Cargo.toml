@@ -6,4 +6,4 @@ edition = "2024"
 [dependencies]
 cryiorust = {git = "https://git.3lp.cx/dyadkin/cryiorust"}
 integrustio = {git = "https://git.3lp.cx/dyadkin/integrustio"}
-rmpfit = "1.0.1"
+rmpfit = "2.0.0"
