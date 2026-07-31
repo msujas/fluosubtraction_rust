@@ -101,7 +101,7 @@ pub fn fluosub_cake(cake:Cake, pfactor:f64, fluo_k: f64)->Cake{
 }
 
 
-pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Cake{
+pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->(Cake, f64){
     let tthrange = cake.radial_positions;
     let chirange = cake.azimuthal_positions;
     let chilen = cake.cake.dim1();
@@ -139,7 +139,7 @@ pub fn fluosub_curvefit(fluo_k0:f64, cake:Cake, pfactor:f64, tthindex:usize)->Ca
     newcake.radial.intensity = i;
     newcake.radial.sigma = sig;
     newcake.radial.positions = tthrange.clone();
-    newcake
+    (newcake, newfluok)
 }
 
 struct Linear{
