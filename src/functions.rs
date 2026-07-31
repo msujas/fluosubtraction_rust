@@ -86,7 +86,13 @@ pub fn fluosub_cake(cake:Cake, pfactor:f64, fluo_k: f64)->Cake{
     let cake = cake.cake.data();
     let mut fluosubcake: Vec<f64> = Vec::new();
     for (i, p) in cake.iter().zip(pmap.iter()){
-        fluosubcake.push(i - fluo_k/p);
+        let isub = i-fluo_k/p;
+        if isub > 0.{
+            fluosubcake.push(i - fluo_k/p);
+        }
+        else {
+            fluosubcake.push(0.);
+        }
     }
     let a = Array::with_data(chisize, tthsize, fluosubcake);
     let (intensity, sigma) = intensity_from_array(&a);
