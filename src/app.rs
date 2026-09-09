@@ -5,16 +5,15 @@ use fluosubtraction_rust::functions::{cakeget1d, fluosub_curvefit, readcake, sav
 #[command(version,about="program for correcting fluorescence from cake files", long_about=None)]
 struct Params{
     /// file to correct fluorescence
-    #[arg(short, long)]
     pub filename: String,
     
     /// polarisation factor
     #[arg(short, long, default_value_t=0.85)]
     pub pfactor: f64,
 
-    /// 2theta index to correct on
-    #[arg(short, long, default_value_t=4500)]
-    pub tthindex: usize,
+    /// 2theta index to correct on (default 90% of number of bins)
+    #[arg(short='i', long)]
+    pub tthindex: Option<usize>,
 
     /// initial fluo constant to use
     #[arg(short, long, default_value_t=1.)]
@@ -28,11 +27,18 @@ fn main(){
     let tthindex = ap.tthindex;
     let k0 = ap.k0;
 
+
     let cake = readcake(&filename);
-    let (newcake, _fluok) = fluosub_curvefit(k0, cake, pfactor, tthindex);
+    let tth = cake.radial_positions.to_vec();
+    let tthi = match tthindex{
+        Some(i) => i,
+        None => tth.len()*90/100,
+    };
+    println!("optimising fluorescence correction using tthindex: {tthi}, k0: {k0}, polarisation factor: {pfactor},\non file: {filename}");
+    let (newcake, _fluok) = fluosub_curvefit(k0, cake, pfactor, tthi);
     let newfilename = &filename.replace(".edf", "_fluosub.edf");
     let vec1d = cakeget1d(&newcake.cake);
-    let tth = newcake.radial_positions.to_vec();
+    
     let newfile1d = filename.replace(".edf", "_fluosub.xy");
     save1d(newfile1d, &tth, &vec1d, None);
     println!("saving fluo sub cake to {newfilename}");
