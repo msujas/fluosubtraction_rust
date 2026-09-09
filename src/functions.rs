@@ -283,7 +283,7 @@ pub fn cakeget1d(cakearray: &Array)-> Vec<f64>{
     pattern1d
 }
 
-pub fn save1d(fname:String, tthrange: &Vec<f64>, vec1d: &Vec<f64>, sigma : Option<&Vec<f64>>){
+pub fn save1d(fname:&Path, tthrange: &Vec<f64>, vec1d: &Vec<f64>, sigma : Option<&Vec<f64>>){
     let mut outstring = String::new();
     //for (x,y ) in  tthrange.iter().zip(vec1d.iter()){
     let mut x:f64;
@@ -303,7 +303,7 @@ pub fn save1d(fname:String, tthrange: &Vec<f64>, vec1d: &Vec<f64>, sigma : Optio
             }
         outstring = outstring + &String::from("\n");
         }
-    println!("saving 1d pattern to {}", &fname);
+    println!("saving 1d pattern to {:?}", &fname);
     
     let mut file = File::create(&fname).expect(&format!("error creating file {:?}",&fname));
     file.write(outstring.as_bytes()).unwrap();    
