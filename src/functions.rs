@@ -1,4 +1,3 @@
-use core::panic;
 use std::{ f64::consts::PI, fs::File, io::Write, sync::Arc };
 
 use cryiorust::{edf::Edf, frame::{Array, Frame, HeaderEntry}};
@@ -29,7 +28,7 @@ fn parse_bubblepattern(bubblepattern_s:&String)-> Pattern1d{
 
         for (count,val) in item.split(" ").enumerate(){
             let value = val.parse::<f64>().unwrap();
-            match count % 3 {
+            match count {
                 0 => ttharray.push(value),
                 1 => intarray.push(value),
                 2 => sigarray.push(value),
@@ -56,17 +55,22 @@ fn parse_bubblecake(bubblecake_s:&String)-> IntegrationRange{
     IntegrationRange { tth0, tthend, chi0, chiend }
 }
 
-pub fn readcake(cakefile:&String)-> Cake{
-    let im = Edf::open(cakefile).unwrap();
+pub struct CakeReadError;
+
+pub fn readcake(cakefile:&String)-> Result<Cake, CakeReadError>{
+    let im = match Edf::open(cakefile) {
+        Ok(e) => e,
+        Err(_e) => {eprintln!("couldn't read file"); return Err(CakeReadError)}
+    };
     let a = im.array().data().clone();
     let bubblepattern_s = match im.header().get("Bubble_pattern"){
         Some(HeaderEntry::String(s)) => s,
-        _ => panic!("couldn't read bubble_pattern")
+        _ => {println!("couldn't read Bubble_pattern"); return Err(CakeReadError)},
     };
     let pattern = parse_bubblepattern(bubblepattern_s);
     let bubblecake = match im.header().get("Bubble_cake"){
         Some(HeaderEntry::String(s)) => s,
-        _ => panic!("couldn't read bubble_cake")
+        _ => {println!("couldn't read Bubble_cake"); return Err(CakeReadError)},
     };
     let chisize = im.dim1();
     let tthsize = im.dim2();
@@ -80,7 +84,7 @@ pub fn readcake(cakefile:&String)-> Cake{
     cake.cake = Array::with_data(chisize, tthsize, a);
     cake.radial.intensity = pattern.intensity;
     cake.radial.sigma = pattern.sigma;
-    cake
+    Ok(cake)
 
 }
 

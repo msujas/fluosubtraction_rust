@@ -1,10 +1,12 @@
+use std::process::exit;
+
 use clap::Parser;
 use fluosubtraction_rust::functions::{cakeget1d, fluosub_curvefit, readcake, save1d};
 
 #[derive(Parser, Debug)]
 #[command(version,about="program for correcting fluorescence from cake files", long_about=None)]
 struct Params{
-    /// file to correct fluorescence
+    /// cake file to correct fluorescence on
     pub filename: String,
     
     /// polarisation factor
@@ -28,7 +30,10 @@ fn main(){
     let k0 = ap.k0;
 
 
-    let cake = readcake(&filename);
+    let cake = match readcake(&filename){
+        Ok(c) => c,
+        Err(_e) => {println!("couldn't read cake, exiting"); exit(1)}
+    };
     let tth = cake.radial_positions.to_vec();
     let tthi = match tthindex{
         Some(i) => i,
