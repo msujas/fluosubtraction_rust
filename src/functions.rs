@@ -1,4 +1,4 @@
-use std::{ f64::consts::PI, fs::File, io::Write, os, path::Path, sync::Arc };
+use std::{ f64::consts::PI, fs::File, io::Write, path::Path, sync::Arc };
 
 use cryiorust::{edf::Edf, frame::{Array, Frame, HeaderEntry}};
 use integrustio::integrator::Cake;
@@ -80,6 +80,8 @@ pub fn readcake(cakefile:&String)-> Result<Cake, CakeReadError>{
     let chisize = im.dim1();
     let tthsize = im.dim2();
     let irange = parse_bubblecake(bubblecake);
+    let _tth0 = irange.tth0;
+    let _tthend = irange.tthend;
     let chi0 = irange.chi0;
     let chiend = irange.chiend;
     let chirange = linspace(chi0, chiend, chisize);
