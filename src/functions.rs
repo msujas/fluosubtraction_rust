@@ -1,4 +1,4 @@
-use std::{ f64::consts::PI, fs::File, io::Write, sync::Arc };
+use std::{ f64::consts::PI, fs::File, io::Write, os, path::Path, sync::Arc };
 
 use cryiorust::{edf::Edf, frame::{Array, Frame, HeaderEntry}};
 use integrustio::integrator::Cake;
@@ -58,6 +58,11 @@ fn parse_bubblecake(bubblecake_s:&String)-> IntegrationRange{
 pub struct CakeReadError;
 
 pub fn readcake(cakefile:&String)-> Result<Cake, CakeReadError>{
+    if !cakefile.ends_with(".edf"){
+        let cakeext = Path::new(cakefile).extension().unwrap();
+        eprintln!("cake file must be in .edf format. Given file is .{cakeext:?}");
+        return Err(CakeReadError)
+    };
     let im = match Edf::open(cakefile) {
         Ok(e) => e,
         Err(_e) => {eprintln!("couldn't read file"); return Err(CakeReadError)}
