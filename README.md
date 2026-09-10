@@ -21,3 +21,12 @@ Options:
   -h, --help                 Print help
   -V, --version              Print version
 ```
+Example:
+
+CeO2 without fluorescence correction
+
+<img src=images/CeO2_fluo.png width=400>
+
+CeO2 with fluorescence correction
+
+<img src=images/CeO2_fluosub.png width=400>
