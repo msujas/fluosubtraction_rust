@@ -23,10 +23,10 @@ Options:
 ```
 Example:
 
-CeO2 without fluorescence correction
+CeO<sub>2</sub> without fluorescence correction
 
 <img src=images/CeO2_fluo.png width=400>
 
-CeO2 with fluorescence correction
+CeO<sub>2</sub> with fluorescence correction
 
 <img src=images/CeO2_fluosub.png width=400>
