@@ -1,7 +1,9 @@
 use std::{fs::create_dir, path::{Path, PathBuf}, process::exit};
 
 use clap::{Parser};
-use fluosubtraction_rust::functions::{cakeget1d, fluosub_curvefit, readcake, save1d};
+use fluosubtraction_rust::functions::{cakeget1d, fluosub_curvefit};
+use fluosubtraction_rust::cakeio::{readcake, save1d};
+
 
 #[derive(Parser, Debug)]
 #[command(version,about="program for correcting fluorescence from cake files", long_about=None)]
